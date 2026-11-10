@@ -21,16 +21,33 @@
 | **war3-tester** | 👉 **[fengshibang123/war3game-skills](https://github.com/fengshibang123/war3game-skills)** (`skills/war3-auto-test`) | **已迁移至新仓库持续维护** |
 | **mentor-kit** | [plugins/mentor-kit/](plugins/mentor-kit/) | 归档 |
 
-## 新仓库安装与使用方式
+## 新仓库安装与使用方式（⚠️ 私有仓库鉴权提示）
 
-请直接使用新的通用技能中枢：
+> **🔐 权限说明**：`fengshibang123/war3game-skills` 为**私有仓库（Private Repository）**。请确保您的 GitHub 账号已被添加为协作者或拥有访问权限，并在本地配置好认证凭据。
 
+### 1. SSH 克隆方式（推荐）
+配置好 GitHub SSH Key 后直接克隆：
 ```bash
-# 克隆新仓库
-git clone https://github.com/fengshibang123/war3game-skills.git
+git clone git@github.com:fengshibang123/war3game-skills.git
 ```
 
-在 Claude Code / Antigravity / Codex / DSH 中直接挂载使用 `war3game-skills`。
+### 2. GitHub CLI 克隆方式
+已登录 `gh`（执行过 `gh auth login`）环境下：
+```bash
+gh repo clone fengshibang123/war3game-skills
+```
+
+### 3. HTTPS + Personal Access Token (PAT)
+```bash
+git clone https://<YOUR_GITHUB_PAT>@github.com/fengshibang123/war3game-skills.git
+```
+
+克隆后进入仓库执行：
+```bash
+cd war3game-skills
+pnpm install
+pnpm run sync    # 一键体检并同步至本地多智能体环境
+```
 
 ## License
 

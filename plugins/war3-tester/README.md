@@ -6,6 +6,8 @@
 > 
 > 🔗 **新仓库地址**：[https://github.com/fengshibang123/war3game-skills](https://github.com/fengshibang123/war3game-skills)
 > 📁 **新技能路径**：`skills/war3-auto-test/`
+>
+> 🔐 **鉴权提醒**：`fengshibang123/war3game-skills` 为**私有仓库（Private Repository）**，克隆与拉取需具备 GitHub 协作者权限。请使用已配置权限的 SSH（`git clone git@github.com:fengshibang123/war3game-skills.git`）或 GitHub CLI（`gh repo clone fengshibang123/war3game-skills`）接入。
 
 ---
 
