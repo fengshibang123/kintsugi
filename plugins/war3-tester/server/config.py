@@ -40,7 +40,8 @@ def to_windows_path(path: str) -> str:
     if path_str.startswith('/mnt/'):
         drive = path_str[5].upper()
         rest = path_str[7:]
-        return f"{drive}:\\{rest.replace('/', '\\')}"
+        rest_win = rest.replace('/', '\\')
+        return f"{drive}:\\{rest_win}"
 
     # 非 WSL 路径，使用 Path.resolve() 解析
     path = Path(path).resolve()
@@ -48,7 +49,8 @@ def to_windows_path(path: str) -> str:
     if path_str.startswith('/mnt/'):
         drive = path_str[5].upper()
         rest = path_str[7:]
-        return f"{drive}:\\{rest.replace('/', '\\')}"
+        rest_win = rest.replace('/', '\\')
+        return f"{drive}:\\{rest_win}"
     return path_str.replace('/', '\\')
 
 

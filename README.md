@@ -1,41 +1,36 @@
-# kintsugi — Claude Code 插件集合
+# ⚠️ [DEPRECATED / 已废弃] 仓库已全面迁移至 war3game-skills
+
+> **重要公告**：本项目（`fengshibang/kintsugi`）中的 **`war3-tester`** 与 War3 自动化测试及开发套件已全面并入新中枢仓库：
+> 👉 **[fengshibang123/war3game-skills](https://github.com/fengshibang123/war3game-skills)**
+>
+> 核心测试能力已统一在 `war3game-skills` 的 `skills/war3-auto-test` 中持续维护与演进（四层测试体系、Named Pipe 管道桥接、34 项 MCP 工具、六大看门狗 Oracle、防作弊三盒纯度审计）。
+> 本仓库已停止维护，后续请统一迁移至 **[fengshibang123/war3game-skills](https://github.com/fengshibang123/war3game-skills)** 使用。
+
+---
+
+# kintsugi — Claude Code 插件集合（旧版归档）
 
 > 金缮（kintsugi）：用金漆修补破碎之处，让裂痕成为美的一部分。
 >
-> 本仓库是一个 Claude Code [插件市场（marketplace）](https://code.claude.com/docs/en/plugin-marketplaces)，收录以下插件。
+> 本仓库已废弃归档。
 
-## 收录插件
+## 迁移指引
 
-| 插件 | 说明 |
-|------|------|
-| **[mentor-kit](plugins/mentor-kit/)** | 师徒试错机制 + eval 框架：师傅监督徒弟改代码，把错误沉淀成 eval case，回归验证。领域中立，任何项目装上即用。 |
-| **[war3-tester](plugins/war3-tester/)** | 通用 War3 地图自动测试 MCP 插件：编译地图 → 启动游戏 → 注入测试脚本 → 接收游戏内 HTTP 回传结果。最小契约（`RunAutoTest` + HTTP POST），不限 Lua 框架。 |
+| 原插件 | 现维护仓库与路径 | 状态 |
+|------|------|------|
+| **war3-tester** | 👉 **[fengshibang123/war3game-skills](https://github.com/fengshibang123/war3game-skills)** (`skills/war3-auto-test`) | **已迁移至新仓库持续维护** |
+| **mentor-kit** | [plugins/mentor-kit/](plugins/mentor-kit/) | 归档 |
 
-## 安装
+## 新仓库安装与使用方式
 
-在 Claude Code 中添加本市场并按需安装插件：
+请直接使用新的通用技能中枢：
 
-```
-/plugin marketplace add fengshibang/kintsugi
-/plugin install mentor-kit@kintsugi
-/plugin install war3-tester@kintsugi
-```
-
-安装 `war3-tester` 后，其 MCP server 会自动注册（声明于 `plugins/war3-tester/.mcp.json`，首次使用走逐服务器审批，用 `/mcp` 查看状态）。
-
-## 目录结构
-
-```
-kintsugi/
-├── .claude-plugin/marketplace.json   # 市场清单（注册两个插件）
-├── plugins/
-│   ├── mentor-kit/                   # 师徒试错 + eval 框架
-│   └── war3-tester/                  # 通用 War3 测试 MCP
-├── LICENSE
-└── README.md
+```bash
+# 克隆新仓库
+git clone https://github.com/fengshibang123/war3game-skills.git
 ```
 
-各插件的安装、配置、使用详见各自目录下的 `README.md`。
+在 Claude Code / Antigravity / Codex / DSH 中直接挂载使用 `war3game-skills`。
 
 ## License
 

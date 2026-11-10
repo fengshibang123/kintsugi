@@ -1240,23 +1240,99 @@ class LocalExecutor(ExecutorBase):
         screenshots_dir.mkdir(parents=True, exist_ok=True)
         screenshot_path = screenshots_dir / filename
 
-        # 直接调用经过实战验证的 do_screenshot.py
-        do_script = r"d:\maps\wzns\do_screenshot.py"
+        # 若外部 do_screenshot 存在可优先委托，否则采用原生 GDI 采集管线
+        do_script = Path(r"d:\maps\wzns\do_screenshot.py")
         try:
-            result = self.execute('python.exe', [do_script, str(screenshot_path)], kwargs={'timeout': 30, 'wait': True})
+            if do_script.exists():
+                result = self.execute('python.exe', [str(do_script), str(screenshot_path)], kwargs={'timeout': 30, 'wait': True})
+                if result.get('success') and screenshot_path.exists():
+                    return {
+                        'success': True,
+                        'message': '截图已保存',
+                        'path': str(screenshot_path),
+                        'path_wsl': str(screenshot_path),
+                        'test_name': test_name,
+                        'filename': filename,
+                    }
 
-            if result.get('success') and screenshot_path.exists():
-                return {
-                    'success': True,
-                    'message': '截图已保存',
-                    'path': str(screenshot_path),
-                    'path_wsl': str(screenshot_path),
-                    'test_name': test_name,
-                    'filename': filename,
-                }
-            else:
-                error_msg = (result.get('stderr') or '').strip() or (result.get('stdout') or '').strip() or result.get('error', '截图失败')
-                return {'success': False, 'error': error_msg}
+            import ctypes
+            from ctypes import wintypes
+            from PIL import Image
+
+            user32 = ctypes.windll.user32
+            gdi32 = ctypes.windll.gdi32
+
+            keywords = ['魔兽', 'Warcraft', 'War3', 'YDWE', 'KK', '争霸']
+            found_hwnd = None
+            EnumWindowsProc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+            def enum_cb(hwnd, lparam):
+                nonlocal found_hwnd
+                if user32.IsWindowVisible(hwnd):
+                    buf = ctypes.create_unicode_buffer(256)
+                    user32.GetWindowTextW(hwnd, buf, 256)
+                    title = buf.value
+                    if title and any(k.lower() in title.lower() for k in keywords):
+                        found_hwnd = hwnd
+                        return False
+                return True
+
+            user32.EnumWindows(EnumWindowsProc(enum_cb), 0)
+            if not found_hwnd:
+                return {'success': False, 'error': '未找到 War3 窗口'}
+
+            rect = wintypes.RECT()
+            user32.GetWindowRect(found_hwnd, ctypes.byref(rect))
+            width, height = rect.right - rect.left, rect.bottom - rect.top
+            if width <= 0 or height <= 0:
+                return {'success': False, 'error': f'窗口尺寸无效: {width}x{height}'}
+
+            hdc_screen = user32.GetDC(0)
+            hdc_mem = gdi32.CreateCompatibleDC(hdc_screen)
+            hbmp = gdi32.CreateCompatibleBitmap(hdc_screen, width, height)
+            gdi32.SelectObject(hdc_mem, hbmp)
+
+            PW_RENDERFULLCONTENT = 0x00000002
+            if user32.PrintWindow(found_hwnd, hdc_mem, PW_RENDERFULLCONTENT) == 0:
+                gdi32.BitBlt(hdc_mem, 0, 0, width, height, hdc_screen, rect.left, rect.top, 0x00CC0020)
+
+            class BITMAPINFOHEADER(ctypes.Structure):
+                _fields_ = [("biSize", wintypes.DWORD), ("biWidth", wintypes.LONG),
+                            ("biHeight", wintypes.LONG), ("biPlanes", wintypes.WORD),
+                            ("biBitCount", wintypes.WORD), ("biCompression", wintypes.DWORD),
+                            ("biSizeImage", wintypes.DWORD), ("biXPelsPerMeter", wintypes.LONG),
+                            ("biYPelsPerMeter", wintypes.LONG), ("biClrUsed", wintypes.DWORD),
+                            ("biClrImportant", wintypes.DWORD)]
+
+            class BITMAPINFO(ctypes.Structure):
+                _fields_ = [("bmiHeader", BITMAPINFOHEADER), ("bmiColors", wintypes.DWORD * 3)]
+
+            bmi = BITMAPINFO()
+            bmi.bmiHeader.biSize = ctypes.sizeof(BITMAPINFOHEADER)
+            bmi.bmiHeader.biWidth = width
+            bmi.bmiHeader.biHeight = -height
+            bmi.bmiHeader.biPlanes = 1
+            bmi.bmiHeader.biBitCount = 24
+            bmi.bmiHeader.biCompression = 0
+
+            pixels = (ctypes.c_byte * (width * height * 3))()
+            gdi32.GetDIBits(hdc_mem, hbmp, 0, height, pixels, ctypes.byref(bmi), 0)
+
+            img = Image.frombytes('RGB', (width, height), bytes(pixels), 'raw', 'BGR')
+            img.save(str(screenshot_path))
+
+            gdi32.DeleteObject(hbmp)
+            gdi32.DeleteDC(hdc_mem)
+            user32.ReleaseDC(0, hdc_screen)
+
+            return {
+                'success': True,
+                'message': '截图已保存',
+                'path': str(screenshot_path),
+                'path_wsl': str(screenshot_path),
+                'test_name': test_name,
+                'filename': filename,
+            }
         except Exception as e:
             return {'success': False, 'error': f'截图异常: {e}'}
 

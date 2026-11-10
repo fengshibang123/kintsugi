@@ -1,4 +1,8 @@
 ---
+# ⚠️ DEPRECATED: 权威内容已迁移至 https://github.com/fengshibang123/war3game-skills
+---
+
+---
 name: war3-auto-test
 version: 3.0.0
 description: "魔兽争霸 3 地图自动化测试与 LLM Agent 实机探索（v3.0 四层测试体系 + Named Pipe 桥接）。支持桌面秒级单测（unit）、实机集成/全流程测试（integration/e2e）、实时命名管道状态查询（inspect_game/exec_game）与 LLM 步进探索/五大 Oracle 自动巡检（game_* 工具）。触发词：自动测试、测试全部、跑测试、/war3-test、测试某模块、实机探索。"
